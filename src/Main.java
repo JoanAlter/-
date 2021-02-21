@@ -14,10 +14,11 @@ public class Main {
         String tags = "azur_lane";
         int a = 0;
         try {
-            Document doc  = Jsoup.connect("https://yande.re/post").get();
+            Document doc  = Jsoup.connect("https://yande.re/post?tags=azur_lane+").get();
 
             // 寻找class为xx的元素,返回ArrayList。
             Elements items = doc.getElementsByClass("thumb");
+            Elements items2 =doc.getElementsByClass("directlink largeimg");
 
             ArrayList<String> URLS = new ArrayList<>();
             ArrayList<String> TAGS = new ArrayList<>();
@@ -25,8 +26,11 @@ public class Main {
                 // 将图片的URL单独提取出来。
                 // child()通过索引得到元素的子元素。
                 // attr()取元素的属性值。
-                URLS.add(i.child(0).attr("src"));
                 TAGS.add(i.child(0).attr("title"));
+            }
+
+            for (Element i: items2) {
+                URLS.add(i.attr("href"));
             }
 
             // 查看有多少张符合要求的图片
@@ -49,7 +53,7 @@ public class Main {
                     System.out.println(">> 正在下载：" + str);
                     // 获取response
                     Connection.Response imgRes = Jsoup.connect(str).ignoreContentType(true).execute();
-                    FileOutputStream out = (new FileOutputStream(new File(file, cnt + ".jpg")));
+                    FileOutputStream out = new FileOutputStream(new File(file, cnt + ".jpg"));
                     // imgRes.body()就是图片数据
                     out.write(imgRes.bodyAsBytes());
                     out.close();
@@ -57,6 +61,7 @@ public class Main {
                 }
                 i++;
             }
+
 
         } catch (Exception e) {
             e.printStackTrace();
